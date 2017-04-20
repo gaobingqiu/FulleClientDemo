@@ -1,0 +1,48 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context=".MainActivity">
+
+    <Button
+        android:id="@+id/btn_to_simple"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="跳到简版一些方法"/>
+
+    <EditText
+        android:id="@+id/edt_username"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btn_to_simple"
+        android:hint="用户名"/>
+
+    <EditText
+        android:id="@+id/edt_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/edt_username"
+        android:hint="密码"/>
+
+    <Button
+        android:id="@+id/btn_check_account"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/edt_password"
+        android:text="检查账户"/>
+
+    <Button
+        android:id="@+id/btn_web_syn_login"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btn_check_account"
+        android:text="接口形式使用web同步登录"/>
+
+    <Button
+        android:id="@+id/btn_user_certification"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btn_web_syn_login"
+        android:text="接口形式使用实名认证"/>
+
+</RelativeLayout>
