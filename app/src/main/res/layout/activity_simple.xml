@@ -1,9 +1,11 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center_horizontal"
-                tools:context=".MainActivity">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:layout_marginStart="@dimen/activity_horizontal_margin"
+    tools:context=".MainActivity">
 
     <GridLayout
         android:id="@+id/gl"
@@ -16,25 +18,25 @@
             android:id="@+id/account_login_register"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="登录注册"/>
+            android:text="@string/account_login_register"/>
 
         <Button
             android:id="@+id/system_account_detail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="账户详情"/>
+            android:text="@string/system_account_detail"/>
 
         <Button
             android:id="@+id/account_login_token_invlaid"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="重新登录"/>
+            android:text="@string/account_login_token_invlaid"/>
 
         <Button
             android:id="@+id/bt_certification"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="实名认证"/>
+            android:text="@string/str_certification"/>
 
         <Button
             android:id="@+id/bt_web_syn_login"
@@ -46,38 +48,38 @@
             android:id="@+id/get_system_account_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="读取系统账号信息"/>
+            android:text="@string/get_system_account_info"/>
 
         <Button
             android:id="@+id/start_bind_baiducloud"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="重新绑定百度云"/>
+            android:text="@string/start_bind_baiducloud"/>
 
 
         <Button
             android:id="@+id/get_baiduclou_accountinfo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="获取百度账户信息"/>
+            android:text="@string/get_baiducloud_accountinfo"/>
 
         <Button
             android:id="@+id/get_baiducloudspace"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="获取百度云空间信息"/>
+            android:text="@string/get_baiducloudspace"/>
 
         <Button
             android:id="@+id/get_thirdbindinfo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="获取第三方账户绑定信息"/>
+            android:text="@string/get_thirdbindinfo"/>
 
         <Button
             android:id="@+id/check_password"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="验证密码"/>
+            android:text="@string/check_password"/>
 
     </GridLayout>
 
@@ -86,7 +88,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/gl"
-        android:hint="请输入要验证密码"/>
+        android:hint="@string/input_password"/>
 
     <cn.nubia.accountsdk.common.NubiaHeadImageView
         android:id="@+id/head_image"

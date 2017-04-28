@@ -1,16 +1,21 @@
 package cn.nubia.fulleclientdemo;
 
 import android.app.Application;
+
 import cn.nubia.accountsdk.fullclient.AccountFullClient;
 import cn.nubia.accountsdk.http.util.HttpApis;
 
+import static cn.nubia.fulleclientdemo.base.Define.NUBIA_ACCOUNT_APPID;
+import static cn.nubia.fulleclientdemo.base.Define.NUBIA_ACCOUNT_APPID_TEST;
+import static cn.nubia.fulleclientdemo.base.Define.NUBIA_ACCOUNT_APPKEY;
+import static cn.nubia.fulleclientdemo.base.Define.NUBIA_ACCOUNT_APPKEY_TEST;
+import static cn.nubia.fulleclientdemo.base.Define.NUBIA_DEVELOPER_APPID;
+import static cn.nubia.fulleclientdemo.base.Define.NUBIA_DEVELOPER_APPKEY;
+
 public class FullApplication extends Application{
 	private static FullApplication mInstance;
-	AccountFullClient fullClient = null;
-	private static final String NUBIA_ACCOUNT_APPID = "SID-CSL905YZ5Jnp";
-	private static final String NUBIA_ACCOUNT_APPKEY = "URD8Dizlhu5Fg2wK";
-	private static final String NUBIA_ACCOUNT_APPID_TEST = "Ba5tw2bmEPZTmUe9";
-	private static final String NUBIA_ACCOUNT_APPKEY_TEST = "GeOQy0fbHY1kru4Z";
+	private AccountFullClient fullClient = null;
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -28,5 +33,9 @@ public class FullApplication extends Application{
 	
 	public AccountFullClient getFullClient(){
 		return fullClient;
+	}
+
+	public void setFullClient(AccountFullClient fullClient){
+		this.fullClient = fullClient;
 	}
 }

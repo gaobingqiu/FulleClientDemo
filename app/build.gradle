@@ -26,5 +26,5 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:25.0.1'
     testCompile 'junit:junit:4.12'
-    compile files('libs/FullClient_V1.1.2_0425.jar')
+    compile files('libs/FullClient_V1.1.2_0427.jar')
 }

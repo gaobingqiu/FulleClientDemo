@@ -1,9 +1,6 @@
 
 package cn.nubia.fulleclientdemo;
 
-import java.lang.ref.WeakReference;
-
-import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -15,14 +12,15 @@ import android.os.Message;
 import android.os.RemoteException;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import cn.nubia.accountsdk.aidl.IAppWebSynLoginListener;
+import java.lang.ref.WeakReference;
+
 import cn.nubia.accountsdk.aidl.ICheckPasswordListener;
 import cn.nubia.accountsdk.aidl.IGetAccountInfoListener;
 import cn.nubia.accountsdk.aidl.IGetBaiduAccountInfoListener;
@@ -32,15 +30,16 @@ import cn.nubia.accountsdk.aidl.ThirdAccountBindInfo;
 import cn.nubia.accountsdk.common.CetificationLackingException;
 import cn.nubia.accountsdk.common.SDKLogUtils;
 import cn.nubia.accountsdk.fullclient.AccountFullClient;
+import cn.nubia.accountsdk.http.NetResponseListener;
+import cn.nubia.accountsdk.http.model.CommonResponse;
 import cn.nubia.accountsdk.simpleclient.AccountSimpleClient;
+import cn.nubia.fulleclientdemo.base.BaseActivity;
 import cn.nubia.fulleclientdemo.base.Define;
-import cn.nubia.fulleclientdemo.base.LogUtils;
 
-public class SimpleActivity extends Activity implements OnClickListener {
+public class SimpleActivity extends BaseActivity implements OnClickListener {
     private ImageView headimage;
     private EditText mPasswordEdit;
     private MainHandler mHandler;
-    private TextView tv_Info;
     private final static int HANDLER_GET_SYSTEM_ACCOUNT = 1;
     private final static int HANDLER_GET_BAIDU_CLOUD_SPACE = 2;
     private final static int HANDLER_GET_BAIDU_CLOUD_ACCOUNTINFO = 3;
@@ -62,6 +61,7 @@ public class SimpleActivity extends Activity implements OnClickListener {
         findViewById(R.id.account_login_token_invlaid).setOnClickListener(this);
         findViewById(R.id.bt_certification).setOnClickListener(this);
         findViewById(R.id.bt_web_syn_login).setOnClickListener(this);
+        findViewById(R.id.bt_web_syn_login).setVisibility(View.GONE);
         headimage = (ImageView) this.findViewById(R.id.head_image);
         findViewById(R.id.get_system_account_info).setOnClickListener(this);
         findViewById(R.id.get_baiducloudspace).setOnClickListener(this);
@@ -70,7 +70,6 @@ public class SimpleActivity extends Activity implements OnClickListener {
         findViewById(R.id.get_thirdbindinfo).setOnClickListener(this);
         mPasswordEdit = (EditText) findViewById(R.id.edt_input_password);
         findViewById(R.id.check_password).setOnClickListener(this);
-        tv_Info = (TextView) findViewById(R.id.tv_info);
         mHandler = new MainHandler(SimpleActivity.this, getMainLooper());
     }
 
@@ -88,11 +87,23 @@ public class SimpleActivity extends Activity implements OnClickListener {
                 fullClient.reLoginWhenTokenInvalid(SimpleActivity.this);
                 break;
             case R.id.bt_certification:
-                try {
-                    fullClient.jumptoCertificationActivity(SimpleActivity.this);
-                } catch (CetificationLackingException exception) {
-                    updateTvInfo("CetificationLackingException");
+                if (TextUtils.isEmpty(Define.tokenId)) {
+                    Toast.makeText(this, "请先登录并且获取用户信息", Toast.LENGTH_SHORT).show();
+                    return;
                 }
+                showProcess();
+                fullClient.getRealIdentity(Define.tokenId, new NetResponseListener<CommonResponse>() {
+                    @Override
+                    public void onResult(CommonResponse commonResponse) {
+                        closeProcess();
+                        String realName = (String) commonResponse.get("real_name");
+                        if (TextUtils.isEmpty(realName)) {
+                            certification();
+                        } else {
+                            updateTvInfo(String.valueOf(commonResponse) + " " + realName + "  " + commonResponse.get("identity_number"));
+                        }
+                    }
+                });
                 break;
             case R.id.bt_web_syn_login:
                 showSingleChoiceDialog(fullClient);
@@ -292,6 +303,19 @@ public class SimpleActivity extends Activity implements OnClickListener {
         }
     }
 
+    private void certification() {
+        AccountFullClient fullClient = FullApplication.getApplication().getFullClient();
+        if (fullClient.isSurportCertification()) {
+            try {
+                fullClient.jumptoCertificationActivity(SimpleActivity.this);
+            } catch (CetificationLackingException exception) {
+                updateTvInfo("CertificationActivity no fount");
+            }
+        } else {
+            showInputInfoDialog(fullClient);
+        }
+    }
+
     public static class MainHandler extends Handler {
         WeakReference<SimpleActivity> reference;
 
@@ -307,9 +331,9 @@ public class SimpleActivity extends Activity implements OnClickListener {
             switch (msg.what) {
                 case HANDLER_GET_SYSTEM_ACCOUNT:
                     if (null != bundle) {
-                        SystemAccountInfo accountInfo = (SystemAccountInfo) bundle.getParcelable("account_info");
+                        SystemAccountInfo accountInfo = bundle.getParcelable("account_info");
                         if (accountInfo == null) {
-                            reference.get().toTast("读取系统账号信息为null，请先登录");
+                            reference.get().showToast("读取系统账号信息为null，请先登录");
                         }
                         reference.get().updateAccountInfo(accountInfo);
                     }
@@ -318,10 +342,10 @@ public class SimpleActivity extends Activity implements OnClickListener {
                     if (null != bundle) {
                         String cloud_space = bundle.getString("cloud_space");
                         if (!TextUtils.isEmpty(cloud_space)) {
-                            reference.get().toTast("获取百度云空间" + cloud_space);
+                            reference.get().showToast("获取百度云空间" + cloud_space);
                             reference.get().updateTvInfo("获取百度云空间" + cloud_space);
                         } else {
-                            reference.get().toTast("获取百度云空间为null，请先登录");
+                            reference.get().showToast("获取百度云空间为null，请先登录");
                             reference.get().updateTvInfo("获取百度云空间为null，请先登录");
                         }
                     }
@@ -334,7 +358,7 @@ public class SimpleActivity extends Activity implements OnClickListener {
                         if (TextUtils.isEmpty(baidutoken)
                                 && TextUtils.isEmpty(baiduuid)
                                 && TextUtils.isEmpty(expiresin)) {
-                            reference.get().toTast("获取百度云账号信息:baidutoken uid expiersin为null，请先登录");
+                            reference.get().showToast("获取百度云账号信息:baidutoken uid expiersin为null，请先登录");
                             reference.get().updateTvInfo("获取百度云账号信息:baidutoken uid expiersin为null，请先登录");
                             return;
                         }
@@ -346,7 +370,7 @@ public class SimpleActivity extends Activity implements OnClickListener {
                         string.append(baiduuid);
                         string.append("|expiresin=");
                         string.append(expiresin);
-                        reference.get().toTast(string.toString());
+                        reference.get().showToast(string.toString());
                         reference.get().updateTvInfo(string.toString());
                     }
                     break;
@@ -363,7 +387,7 @@ public class SimpleActivity extends Activity implements OnClickListener {
                         string.append(baiduuid);
                         string.append("|expiresin=");
                         string.append(expiresin);
-                        reference.get().toTast(string.toString());
+                        reference.get().showToast(string.toString());
                         reference.get().updateTvInfo(string.toString());
                     }
                     break;
@@ -371,12 +395,12 @@ public class SimpleActivity extends Activity implements OnClickListener {
                     if (null != bundle) {
                         String third_bind = bundle.getString("third_bind", "");
                         if (!TextUtils.isEmpty(third_bind)) {
-                            reference.get().toTast("第三方绑定情况: " + third_bind);
+                            reference.get().showToast("第三方绑定情况: " + third_bind);
                             reference.get().updateTvInfo("第三方绑定情况: " + third_bind);
                         } else {
                             String errormsg = bundle.getString("errormsg", "");
                             String errorcode = bundle.getString("errorcode", "");
-                            reference.get().toTast("第三方绑定情况: errorcode=" + errorcode + "errormsg=" + errormsg + "请先登录");
+                            reference.get().showToast("第三方绑定情况: errorcode=" + errorcode + "errormsg=" + errormsg + "请先登录");
                             reference.get().updateTvInfo("第三方绑定情况: errorcode=" + errorcode + "errormsg=" + errormsg + "请先登录");
                         }
                     }
@@ -385,7 +409,7 @@ public class SimpleActivity extends Activity implements OnClickListener {
                     if (null != bundle) {
                         boolean isCheckResult = bundle.getBoolean("isCheckResult", false);
                         String is = isCheckResult ? "密码正确" : "密码错误";
-                        reference.get().toTast("验证密码: " + is);
+                        reference.get().showToast("验证密码: " + is);
                         reference.get().updateTvInfo("验证密码: " + is);
                     }
                     break;
@@ -419,25 +443,18 @@ public class SimpleActivity extends Activity implements OnClickListener {
         headimage.invalidate();
     }
 
-    private void toTast(String msg) {
-        Toast.makeText(SimpleActivity.this, msg, Toast.LENGTH_SHORT).show();
-    }
-
     private void updateAccountInfo(SystemAccountInfo accountInfo) {
         if (accountInfo == null) {
             headimage.setImageBitmap(null);
-            tv_Info.setText("");
+            updateTvInfo("");
         }
+        assert accountInfo != null;
         Bitmap bitmap = accountInfo.getHeadImage();
         if (bitmap != null && !bitmap.isRecycled()) {
             headimage.setImageBitmap(bitmap);
         }
         headimage.invalidate();
-        tv_Info.setText("账户详情=" + accountInfo.toString());
-    }
-
-    private void updateTvInfo(String string) {
-        tv_Info.setText(string);
+        updateTvInfo("账户详情=" + accountInfo.toString());
     }
 
     private int mChoice;
@@ -460,36 +477,71 @@ public class SimpleActivity extends Activity implements OnClickListener {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         mUrl = Define.WEB_URL[mChoice];
-                        try {
-                            fullClient.appWebSynlogin(Define.WEB_URL[mChoice], new IAppWebSynLoginListener.Stub() {
-                                @Override
-                                public void onComplete(String s) {
-                                    LogUtils.d(s);
-                                    Message msg = Message.obtain();
-                                    msg.what = HANDLER_WEB_SYN_LOGIN;
-                                    Bundle bundle = new Bundle();
-                                    bundle.putString("syn_url", s);
-                                    msg.setData(bundle);
-                                    mHandler.sendMessage(msg);
-                                }
-
-                                @Override
-                                public void onException(String s) {
-                                    LogUtils.d(s);
-                                    Message msg = Message.obtain();
-                                    msg.what = HANDLER_WEB_SYN_LOGIN;
-                                    Bundle bundle = new Bundle();
-                                    bundle.putString("error_msg", s);
-                                    msg.setData(bundle);
-                                    mHandler.sendMessage(msg);
-                                }
-                            });
-                        } catch (RemoteException e) {
-                            e.printStackTrace();
-                        }
+//                        try {
+//                            fullClient.appWebSynlogin(Define.WEB_URL[mChoice], new IAppWebSynLoginListener.Stub() {
+//                                @Override
+//                                public void onComplete(String s) {
+//                                    LogUtils.d(s);
+//                                    Message msg = Message.obtain();
+//                                    msg.what = HANDLER_WEB_SYN_LOGIN;
+//                                    Bundle bundle = new Bundle();
+//                                    bundle.putString("syn_url", s);
+//                                    msg.setData(bundle);
+//                                    mHandler.sendMessage(msg);
+//                                }
+//
+//                                @Override
+//                                public void onException(String s) {
+//                                    LogUtils.d(s);
+//                                    Message msg = Message.obtain();
+//                                    msg.what = HANDLER_WEB_SYN_LOGIN;
+//                                    Bundle bundle = new Bundle();
+//                                    bundle.putString("error_msg", s);
+//                                    msg.setData(bundle);
+//                                    mHandler.sendMessage(msg);
+//                                }
+//                            });
+//                        } catch (RemoteException e) {
+//                            e.printStackTrace();
+//                        }
                     }
                 }
         );
         singleChoiceDialog.show();
+    }
+
+    private void showInputInfoDialog(final AccountFullClient fullClient) {
+        final AlertDialog.Builder inputDialog =
+                new AlertDialog.Builder(this);
+        final View dialogView = LayoutInflater.from(SimpleActivity.this)
+                .inflate(R.layout.dialog_input_info, null);
+        final EditText realNameEt = (EditText) dialogView.findViewById(R.id.et_real_name);
+        final EditText idCardEt = (EditText) dialogView.findViewById(R.id.et_id_card);
+        inputDialog.setTitle("请输入姓名和身份证：").setView(dialogView);
+        inputDialog.setPositiveButton("确定",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String realName = realNameEt.getText().toString();
+                        String idCard = idCardEt.getText().toString();
+                        if (TextUtils.isEmpty(realName) || TextUtils.isEmpty(idCard)) {
+                            Toast.makeText(SimpleActivity.this, "请输入姓名和身份证", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        fullClient.userCertification(Define.tokenId, realName, idCard,
+                                new NetResponseListener<CommonResponse>() {
+                                    @Override
+                                    public void onResult(CommonResponse response) {
+                                        if (response.getErrorCode() == 0) {
+                                            Toast.makeText(SimpleActivity.this, "认证成功", Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            Toast.makeText(SimpleActivity.this, response.getErrorMessage(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
+                    }
+                }
+        );
+        inputDialog.show();
     }
 }

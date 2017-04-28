@@ -3,4 +3,22 @@
     <string name="web_syn_login">web同步登录</string>
     <string name="str_real_name">真实姓名</string>
     <string name="str_id_card">身份证</string>
+    <string name="get_identity">获取实名信息</string>
+    <string name="check_password">验证密码</string>
+    <string name="get_thirdbindinfo">获取第三方账户绑定信息</string>
+    <string name="get_baiducloudspace">获取百度云空间信息</string>
+    <string name="get_baiducloud_accountinfo">获取百度账户信息</string>
+    <string name="start_bind_baiducloud">重新绑定百度云</string>
+    <string name="get_system_account_info">读取系统账号信息</string>
+    <string name="str_certification">实名认证</string>
+    <string name="account_login_token_invlaid">重新登录</string>
+    <string name="system_account_detail">账户详情</string>
+    <string name="account_login_register">登录注册</string>
+    <string name="input_password">请输入要验证密码</string>
+    <string name="check_account">检查账户</string>
+    <string name="str_password">密码</string>
+    <string name="str_username">用户名</string>
+    <string name="to_simple">跳到简版一些方法</string>
+    <string name="set_app">设置appID和appKey</string>
+    <string name="str_get_identity">获取实名信息</string>
 </resources>

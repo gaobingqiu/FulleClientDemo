@@ -40,7 +40,7 @@ public class LogUtils {
 
 		// Throwable instance must be created before any methods
 		getMethodNames(new Throwable().getStackTrace());
-		Log.e(className, createLog(message));
+		Log.e("MyApplication", createLog(message));
 	}
 
 

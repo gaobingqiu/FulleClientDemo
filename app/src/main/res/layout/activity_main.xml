@@ -8,41 +8,55 @@
         android:id="@+id/btn_to_simple"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="跳到简版一些方法"/>
+        android:text="@string/to_simple"/>
+
+    <Button
+        android:id="@+id/btn_set_app"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btn_to_simple"
+        android:text="@string/set_app"/>
+
+    <Button
+        android:id="@+id/btn_web_syn_login"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btn_set_app"
+        android:text="@string/web_syn_login"/>
 
     <EditText
         android:id="@+id/edt_username"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/btn_to_simple"
-        android:hint="用户名"/>
+        android:layout_below="@id/btn_web_syn_login"
+        android:hint="@string/str_username"/>
 
     <EditText
         android:id="@+id/edt_password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/edt_username"
-        android:hint="密码"/>
+        android:hint="@string/str_password"/>
 
     <Button
         android:id="@+id/btn_check_account"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/edt_password"
-        android:text="检查账户"/>
+        android:text="@string/check_account"/>
 
-    <Button
-        android:id="@+id/btn_web_syn_login"
-        android:layout_width="fill_parent"
+    <ScrollView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/btn_check_account"
-        android:text="接口形式使用web同步登录"/>
+        android:layout_below="@id/btn_check_account">
 
-    <Button
-        android:id="@+id/btn_user_certification"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/btn_web_syn_login"
-        android:text="接口形式使用实名认证"/>
+        <TextView
+            android:id="@+id/tv_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="5dp"/>
+    </ScrollView>
 
 </RelativeLayout>
